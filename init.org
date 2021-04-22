@@ -15,6 +15,10 @@
   (require 'programming-languages)
 
   (require 'magit-settings)
+
+  (require 'helm-youtube)
+
+  (require 'clean-buffers)
 #+END_SRC
 
 * Package Management
@@ -294,12 +298,37 @@ Lets have all the icons
   (use-package all-the-icons
     :ensure t)
 #+END_SRC
+
 ** Provide
 Provide *interface-settings.el*
 
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
 (provide 'interface-settings)
 #+END_SRC
+
+* Clean Buffers
+
+Kill all buffers
+
+#+BEGIN_SRC elisp :tangle ./plugins/clean-buffers.el :mkdirp yesn
+(defun kill-buffers()
+  (let (buffer buffers)
+    (setq buffers (buffer-list))
+    (dotimes (i (length buffers))
+      (setq buffer (pop buffers))
+      (if (not (string-equal (buffer-name buffer) "*scratch*")) (kill-buffer buffer) nil))))
+
+(defun clean-buffers()
+       (interactive)
+       (if (yes-or-no-p "Do you really want to clean all buffers? ")
+           (kill-buffers) nil))
+
+(global-set-key (kbd "C-x C-k") 'clean-buffers)
+
+(provide 'clean-buffers)
+#+END_SRC
+
+
 
 * Editing
 :PROPERTIES:
@@ -427,6 +456,18 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
     (define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand))
 #+END_SRC
 
+** Ripgrep
+
+#+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
+  (use-package helm-rg
+    :ensure t
+    :config (global-set-key (kbd "C-c C-s") 'helm-rg))
+
+  (use-package rg
+    :ensure t
+    :config (global-set-key (kbd "C-c s") 'rg))
+#+END_SRC
+
 ** Provide
 Provide *editing-settings.el*
 
@@ -441,37 +482,40 @@ Provide *editing-settings.el*
 
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package elixir-mode
+    (use-package elixir-mode
+      :ensure t)
+
+    (setq lsp-keymap-prefix "M-s")
+
+  (use-package which-key
     :ensure t)
 
-  (setq lsp-keymap-prefix "M-s")
+    (use-package lsp-mode
+      :ensure t
+      :hook ((elixir-mode . lsp)
+             (before-save . lsp-format-buffer)
+             (lsp-mode . lsp-enable-which-key-integration))
+      :commands lsp
+      :init
+      (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.11")
+      (setq lsp-enable-file-watchers nil))
 
-  (use-package lsp-mode
-    :ensure t
-    :hook ((elixir-mode . lsp)
-           (before-save . lsp-format-buffer)
-           (lsp-mode . lsp-enable-which-key-integration))
-    :commands lsp
-    :init
-    (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.11")
-    (setq lsp-enable-file-watchers nil))
+    (use-package helm-lsp
+      :ensure t
+      :diminish lsp-mode
+      :commands helm-lsp-workspace-symbol)
 
-  (use-package helm-lsp
-    :ensure t
-    :diminish lsp-mode
-    :commands helm-lsp-workspace-symbol)
+    (use-package elixir-yasnippets
+      :ensure t)
 
-  (use-package elixir-yasnippets
-    :ensure t)
+    (use-package company
+      :ensure t
+      :after lsp
+      :hook (prog-mode . company-mode))
 
-  (use-package company
-    :ensure t
-    :after lsp
-    :hook (prog-mode . company-mode))
-
-  (use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode))
+    (use-package company-box
+      :ensure t
+      :hook (company-mode . company-box-mode))
 #+END_SRC
 
 ** Provide
