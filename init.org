@@ -16,8 +16,6 @@
 
   (require 'magit-settings)
 
-  (require 'helm-youtube)
-
   (require 'clean-buffers)
 #+END_SRC
 
