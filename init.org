@@ -71,6 +71,17 @@ Backup `~` ended files in ~.emacs.d/backup/~.
 
 #+END_SRC
 
+** SSH keys
+
+#+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-copy-env "SSH_AGENT_PID")
+  (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
+#+END_SRC
+
+
 ** Provide
 Provide *package-management-settings.el*
 
