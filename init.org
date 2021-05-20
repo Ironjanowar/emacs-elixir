@@ -202,6 +202,7 @@ I wanted a symbol in the left hand so I con move with *<symbol> +
     (marginalia-mode))
 
   (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 #+END_SRC
    
 
