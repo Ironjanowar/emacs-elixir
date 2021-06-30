@@ -171,11 +171,24 @@ I wanted a symbol in the left hand so I con move with *<symbol> +
 ** Vertico
 
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
+  ;; Thanks to @devcexx <3
+  ;; https://github.com/devcexx/emacs-config/blob/master/config/avoc-text-utils.el#L22
+  (defun avoc-text-utils-delete-word (arg)
+    "Delete characters forward until encountering the end of a word.
+  With argument ARG, do this that many times."
+    (interactive "p")
+    (delete-region (point) (progn (forward-word arg) (point))))
+
+  (defun avoc-text-utils-backward-delete-word (arg)
+    "Delete characters backward until encountering the beginning of a word.
+  With argument ARG, do this that many times."
+    (interactive "p")
+    (avoc-text-utils-delete-word (- arg)))
 
   ;; Enable vertico
   (use-package vertico
     :ensure t
-    :bind (:map minibuffer-local-map ("C-l" . backward-kill-word))
+    :bind (:map minibuffer-local-map ("C-l" . avoc-text-utils-backward-delete-word))
     :init
     (vertico-mode)
     (setq vertico-cycle t))
