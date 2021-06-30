@@ -434,6 +434,16 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
     :config (global-set-key (kbd "C-c s") 'rg))
 #+END_SRC
 
+** Jump multiple line
+
+#+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
+  (global-set-key (kbd "C-S-n")
+                  (lambda () (interactive) (next-line 10)))
+
+  (global-set-key (kbd "C-S-p")
+                  (lambda () (interactive) (previous-line 10)))
+#+END_SRC
+
 ** Provide
 Provide *editing-settings.el*
 
@@ -454,7 +464,9 @@ Provide *editing-settings.el*
   (setq lsp-keymap-prefix "M-s")
 
   (use-package which-key
-    :ensure t)
+    :ensure t
+    :init
+    (which-key-mode))
 
   (use-package lsp-mode
     :ensure t
