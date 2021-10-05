@@ -469,6 +469,18 @@ Provide *editing-settings.el*
 :tangle:   ~/.emacs.d/settings/programming-languages.el
 :END:
 
+** Web
+
+#+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
+  (use-package web-mode
+    :ensure t
+    :mode "\\.html.leex\\'"
+    :custom
+    (web-mode-markup-indent-offset 2)
+    (web-mode-css-indent-offset 2)
+    (web-mode-code-indent-offset 2))
+#+END_SRC
+
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
   (use-package elixir-mode
@@ -488,7 +500,8 @@ Provide *editing-settings.el*
            (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp
     :init
-    (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.11")
+    ;; (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.11")
+    (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.12-compiled")
     (setq lsp-enable-file-watchers nil))
 
   (use-package flycheck
@@ -518,6 +531,12 @@ Provide *editing-settings.el*
   (use-package company-box
     :ensure t
     :hook (company-mode . company-box-mode))
+
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-mode +1)
+    (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
 #+END_SRC
 
 ** Provide
