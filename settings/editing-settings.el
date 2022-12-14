@@ -1,3 +1,5 @@
+(setq ring-bell-function 'ignore)
+
 ;; Multiple cursors
 (use-package multiple-cursors
   :ensure t
@@ -64,5 +66,19 @@
   (define-key yas-minor-mode-map (kbd "<tab>") nil)
   (define-key yas-minor-mode-map (kbd "TAB") nil)
   (define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand))
+
+(use-package helm-rg
+  :ensure t
+  :config (global-set-key (kbd "C-c C-s") 'helm-rg))
+
+(use-package rg
+  :ensure t
+  :config (global-set-key (kbd "C-c s") 'rg))
+
+(global-set-key (kbd "C-S-n")
+                (lambda () (interactive) (next-line 10)))
+
+(global-set-key (kbd "C-S-p")
+                (lambda () (interactive) (previous-line 10)))
 
 (provide 'editing-settings)

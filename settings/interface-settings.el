@@ -21,6 +21,8 @@
   :ensure t
   :config (load-theme 'kaolin-galaxy t))
 
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono 11" ))
+
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode)
@@ -33,80 +35,51 @@
          ("C-. C-t" . windmove-down))
   )
 
-;; By @rockneurotiko
-(use-package helm
+;; Thanks to @devcexx <3
+;; https://github.com/devcexx/emacs-config/blob/master/config/avoc-text-utils.el#L22
+(defun avoc-text-utils-delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument ARG, do this that many times."
+  (interactive "p")
+  (delete-region (point) (progn (forward-word arg) (point))))
+
+(defun avoc-text-utils-backward-delete-word (arg)
+  "Delete characters backward until encountering the beginning of a word.
+With argument ARG, do this that many times."
+  (interactive "p")
+  (avoc-text-utils-delete-word (- arg)))
+
+;; Enable vertico
+(use-package vertico
   :ensure t
-  :diminish helm-mode
+  :bind (:map minibuffer-local-map ("C-l" . avoc-text-utils-backward-delete-word))
   :init
-  (progn
-    (require 'helm-config)
-    (setq helm-candidate-number-limit 100)
-    ;; From https://gist.github.com/antifuchs/9238468
-    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-          helm-input-idle-delay 0.01  ; this actually updates things
-                                        ; reeeelatively quickly.
-          helm-yas-display-key-on-candidate t
-          helm-quick-update t
-          helm-M-x-requires-pattern nil
-          helm-ff-skip-boring-files t)
-    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-          helm-buffers-fuzzy-matching           t ; fuzzy matching buffer names when non--nil
-          helm-recentf-fuzzy-match              t
-          helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-          helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-          helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-          helm-ff-file-name-history-use-recentf t
-          helm-M-x-fuzzy-match t)  ;; optional fuzzy matching for helm-M-x
-    (helm-mode))
-  :config
-  (progn
-    ;; rebind tab to run persistent action
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    ;; make TAB works in terminal
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-    ;; list actions using C-z
-    (define-key helm-map (kbd "C-z")  'helm-select-action))
-  :bind (("C-x C-f" . helm-find-files)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x b" . helm-mini)
-         ("M-y" . helm-show-kill-ring)
-         ("M-x" . helm-M-x)
-         ("C-h a" . helm-apropos)
-         ("C-x c o" . helm-occur)
-         ("C-x c y" . helm-yas-complete)
-         ("C-x c Y" . helm-yas-create-snippet-on-region)
-         ("C-x c SPC" . helm-all-mark-rings)
-         ("C-c h g" . helm-google-suggest)))
+  (vertico-mode)
+  (setq vertico-cycle t))
 
-(ido-mode -1)
-
-(use-package helm-descbinds
+(use-package orderless
   :ensure t
-  :bind (("C-h b" . helm-descbinds)
-         ("C-h w" . helm-descbinds)))
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
 
-(use-package helm-swoop
-  ;; :disabled t
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
   :ensure t
-  :bind (("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point)
-         ("C-c M-i" . helm-multi-swoop)
-         ("C-x M-i" . helm-multi-swoop-all)))
+  :init
+  (savehist-mode))
 
-(use-package ace-jump-helm-line
-  ;; :disabled t
+(use-package marginalia
+  :after vertico
   :ensure t
-  :commands helm-mode
-  :init (define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
 
-
-(defun set-helm-swoop ()
-  ;; Change the keybinds to whatever you like :)
-  )
-
-
-(defun set-helm-ace-jump ()
-  )
+(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
 ;; Rainbow delimeters
 (use-package rainbow-delimiters

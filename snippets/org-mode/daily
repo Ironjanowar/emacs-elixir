@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: daily
+# key: daily
+# --
+# Daily `(format-time-string "%Y-%m-%d")`
+- Last day:
+  + $1
+  + $2
+- Today:
+  + $3
+  + $4
+- Blocks:
+  + Nope$0

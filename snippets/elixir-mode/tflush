@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: flush
+# key: flush
+# --
+messages = :erlang.process_info(self(), :messages)
+IO.inspect(messages, label: "messages")

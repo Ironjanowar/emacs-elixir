@@ -1,5 +1,6 @@
-tramp
-projects
-elpa/*
-auto-save-list/*
-history
+*
+
+!init.org
+!settings/*
+!snippets/*
+!plugins/*
