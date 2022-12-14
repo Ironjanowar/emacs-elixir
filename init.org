@@ -486,31 +486,30 @@ Provide *editing-settings.el*
 
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-      (use-package elixir-mode
-        :ensure t
-        :config)
+  (use-package elixir-mode
+    :ensure t
+    :config)
 
+  (use-package which-key
+    :ensure t
+    :init
+    (which-key-mode))
 
-      (use-package which-key
-        :ensure t
-        :init
-        (which-key-mode))
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
 
-      (use-package flycheck
-        :ensure t
-        :init (global-flycheck-mode))
+  (use-package elixir-yasnippets
+    :ensure t)
 
-      (use-package elixir-yasnippets
-        :ensure t)
+  (use-package company
+    :ensure t
+    :after lsp
+    :hook (prog-mode . company-mode))
 
-      (use-package company
-        :ensure t
-        :after lsp
-        :hook (prog-mode . company-mode))
-
-      (use-package company-box
-        :ensure t
-        :hook (company-mode . company-box-mode))
+  (use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
 
   (use-package projectile
     :ensure t
@@ -520,9 +519,10 @@ Provide *editing-settings.el*
 
   (use-package eglot
     :ensure t
+    :hook (before-save . eglot-format-buffer)
     :config
     (add-hook 'elixir-mode-hook 'eglot-ensure)
-    (add-to-list 'eglot-server-programs '(elixir-mode . ("~/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1/language_server.sh"))))
+    (add-to-list 'eglot-server-programs '(elixir-mode . ("sh" "/home/ironjanowar/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1/language_server.sh"))))
 #+END_SRC
 
 ** Provide
