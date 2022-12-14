@@ -346,29 +346,23 @@ Good stuff with parens (https://github.com/Fuco1/smartparens)
   :ensure t
   :init (smartparens-global-mode t))
 #+END_SRC
-** Pretty icons
-Locating the cursor right after "->" and pressing ~Shift + Space~ transforms it into "→"
-
-#+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
-  (use-package xah-math-input
-    :ensure t)
-#+END_SRC
 
 ** Undo
 
 Glorious undo with `C-z` and redoo with `C-S-z`.
 
 #+BEGIN_SRC elisp :tangle ./settings/editing-settings.el
-;; Undo
-(use-package undo-tree
-  :ensure t
-  :init
-  (defalias 'redo 'undo-tree-redo)
-  :config
-  (global-undo-tree-mode 1)
-  (global-set-key (kbd "C-z") 'undo)
-  (global-set-key (kbd "C-S-z") 'redo)
-  )
+  ;; Undo
+  (use-package undo-tree
+    :ensure t
+    :init
+    (defalias 'redo 'undo-tree-redo)
+    :config
+    (global-undo-tree-mode 1)
+    (global-set-key (kbd "C-z") 'undo)
+    (global-set-key (kbd "C-S-z") 'redo)
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+    )
 #+END_SRC
 
 ** Indent buffer
@@ -492,62 +486,64 @@ Provide *editing-settings.el*
 
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package elixir-mode
-    :ensure t
-    :config)
+      (use-package elixir-mode
+        :ensure t
+        :config)
 
-  (setq lsp-keymap-prefix "M-s")
+      (setq lsp-keymap-prefix "M-s")
 
-  (use-package which-key
-    :ensure t
-    :init
-    (which-key-mode))
+      (use-package which-key
+        :ensure t
+        :init
+        (which-key-mode))
 
-  (use-package lsp-mode
-    :ensure t
-    :hook ((elixir-mode . lsp)
-           (before-save . lsp-format-buffer)
-           (lsp-mode . lsp-enable-which-key-integration))
-    :commands lsp
-    :init
-    ;; (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.13-compiled")
-    (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1")
-    (setq lsp-enable-file-watchers nil))
+      (use-package lsp-mode
+        :ensure t
+        :hook ((elixir-mode . lsp)
+               (before-save . lsp-format-buffer)
+               (lsp-mode . lsp-enable-which-key-integration))
+        :commands lsp
+        :init
+        ;; (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.13-compiled")
+        (add-to-list 'exec-path "~/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1")
+        (setq lsp-enable-file-watchers nil)
+        :config
+        (setq lsp-lens-enable nil))
 
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode))
+      (use-package flycheck
+        :ensure t
+        :init (global-flycheck-mode))
 
-  (use-package lsp-ui
-    :ensure t
-    :init
-    (setq lsp-ui-doc-enable nil
-          lsp-ui-flycheck-enable t
-          lsp-prefer-flymake nil
-          lsp-log-io nil))
+      (use-package lsp-ui
+        :ensure t
+        :init
+        (setq lsp-ui-doc-enable nil
+              lsp-ui-flycheck-enable t
+              lsp-prefer-flymake nil
+              lsp-log-io nil))
 
-  (use-package helm-lsp
-    :ensure t
-    :diminish lsp-mode
-    :commands helm-lsp-workspace-symbol)
+      (use-package helm-lsp
+        :ensure t
+        :diminish lsp-mode
+        :commands helm-lsp-workspace-symbol)
 
-  (use-package elixir-yasnippets
-    :ensure t)
+      (use-package elixir-yasnippets
+        :ensure t)
 
-  (use-package company
-    :ensure t
-    :after lsp
-    :hook (prog-mode . company-mode))
+      (use-package company
+        :ensure t
+        :after lsp
+        :hook (prog-mode . company-mode))
 
-  (use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode))
+      (use-package company-box
+        :ensure t
+        :hook (company-mode . company-box-mode))
 
-  (use-package projectile
-    :ensure t
-    :config
-    (projectile-mode +1)
-    (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+      (use-package projectile
+        :ensure t
+        :config
+        (projectile-mode +1)
+        (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
 #+END_SRC
 
 ** Provide
