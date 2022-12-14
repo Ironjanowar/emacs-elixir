@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: logjson
+# key: logjson
+# --
+Logger.warn("$1: #{$1 |> inspect(pretty: true)}")

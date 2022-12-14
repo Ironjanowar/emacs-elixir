@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: rlog
+# key: rlog
+# --
+require Logger
