@@ -486,43 +486,47 @@ Provide *editing-settings.el*
 
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package elixir-mode
-    :ensure t
-    :config)
+    (use-package elixir-mode
+      :ensure t
+      :config)
 
-  (use-package which-key
-    :ensure t
-    :init
-    (which-key-mode))
+    (use-package which-key
+      :ensure t
+      :init
+      (which-key-mode))
 
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode))
+    (use-package flycheck
+      :ensure t
+      :init (global-flycheck-mode))
 
-  (use-package elixir-yasnippets
-    :ensure t)
+    (use-package elixir-yasnippets
+      :ensure t)
 
-  (use-package company
-    :ensure t
-    :after lsp
-    :hook (prog-mode . company-mode))
+    ;; (use-package company
+    ;;   :ensure t
+    ;;   :init (global-company-mode))
 
-  (use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode))
+    ;; (use-package company-box
+    ;;   :ensure t
+    ;;   :hook (company-mode . company-box-mode))
 
-  (use-package projectile
-    :ensure t
-    :config
-    (projectile-mode +1)
-    (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+    (use-package corfu
+      :ensure t
+      :hook (prog-mode . corfu-mode)
+      :config (setq corfu-auto t))
 
-  (use-package eglot
-    :ensure t
-    :hook (before-save . eglot-format-buffer)
-    :config
-    (add-hook 'elixir-mode-hook 'eglot-ensure)
-    (add-to-list 'eglot-server-programs '(elixir-mode . ("sh" "/home/ironjanowar/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1/language_server.sh"))))
+    (use-package projectile
+      :ensure t
+      :config
+      (projectile-mode +1)
+      (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+
+    (use-package eglot
+      :ensure t
+      :hook (before-save . eglot-format-buffer)
+      :config
+      (add-hook 'elixir-mode-hook 'eglot-ensure)
+      (add-to-list 'eglot-server-programs '(elixir-mode . ("sh" "/home/ironjanowar/.emacs.d/settings/elixir-ls/elixir-ls-1.14-25.1/language_server.sh"))))
 #+END_SRC
 
 ** Provide
@@ -556,6 +560,10 @@ Magit is a lovely mode for git.
     (setq magit-gitflow-popup-key ".")
     :config
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+
+  ;; Magit TODO
+  (use-package magit-todos
+    :ensure t)
 #+END_SRC
 
 ** Provide
