@@ -577,6 +577,20 @@ Magit is a lovely mode for git.
     (setq magit-gitflow-popup-key ".")
     :config
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+
+  ;; Magit TODO
+  (use-package magit-todos
+    :ensure t
+    :init
+    (setq hl-todo-keyword-faces
+        '(("TODO"   . "#FF0000")
+          ("FIXME"  . "#FF0000")
+          ("DEBUG"  . "#A020F0")
+          ("GOTCHA" . "#FF4500")
+          ("STUB"   . "#1E90FF")
+          ("TODO cesar" . "#FF0000")))
+    :config
+    (add-hook 'magit-mode-hook 'magit-todos-mode))
 #+END_SRC
 
 ** Provide
