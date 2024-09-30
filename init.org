@@ -31,16 +31,18 @@ Adding ~melpa stable~ to avoid conflicts.
 
 #+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
 
-(when (>= emacs-major-version 24)
-  (require 'package)
-  (add-to-list
-   'package-archives
-   '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list
-   'package-archives
-   '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
-  (package-initialize))
-
+  (when (>= emacs-major-version 24)
+    (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+                             ("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
+                             ("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/")
+                             ("gnu" . "http://elpa.gnu.org/packages/")))
+    (setq package-archive-priorities '(("melpa" . 5)
+                                       ("melpa-stable" . 4)
+                                       ("jcs-elpa" . 0)
+                                       ("gnu" . 1)))
+    (setq url-queue-timeout 30)
+    (require 'package)
+    (package-initialize))
 #+END_SRC
 
 ** Use-package
@@ -57,6 +59,28 @@ https://github.com/jwiegley/use-package
   (package-install 'use-package)
   )
 
+#+END_SRC
+
+** Straight
+
+#+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el"
+          (or (bound-and-true-p straight-base-dir)
+              user-emacs-directory)))
+        (bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  (straight-use-package 'use-package)
 #+END_SRC
 
 ** Backup files
@@ -459,6 +483,18 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
                   (lambda () (interactive) (previous-line 10)))
 #+END_SRC
 
+** Jump multiple line
+
+#+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
+  (use-package chatgpt
+    :ensure t
+    :config
+    (setq chatgpt-model "gpt-4o"))
+
+  (setq openai-key "key")
+#+END_SRC
+
+
 ** Provide
 Provide *editing-settings.el*
 
@@ -483,12 +519,29 @@ Provide *editing-settings.el*
     (web-mode-code-indent-offset 2))
 #+END_SRC
 
+** Copilot
+#+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
+  (use-package copilot
+    :straight '(copilot
+                :type git
+                :host github
+                :repo "zerolfx/copilot.el"
+                :branch "main"
+                :files ("dist" "*.el"))
+    :hook (prog-mode . copilot-mode)
+    :bind (:map copilot-completion-map
+                ("<tab>" . 'copilot-accept-completion)
+                ("TAB" . 'copilot-accept-completion)
+                ("C-TAB" . 'copilot-accept-completion-by-word)
+                ("C-<tab>" . 'copilot-accept-completion-by-word))
+    :config
+    (setq copilot-indent-offset-warning-disable t))
+#+END_SRC
+
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
   (use-package elixir-mode
-    :ensure t
-    :custom
-    (lsp-elixir-server-command '("/home/ironjanowar/.emacs.d/settings/lexical/_build/dev/package/lexical/bin/start_lexical.sh")))
+    :ensure t)
 
   (setq lsp-keymap-prefix "M-s")
 
@@ -510,10 +563,12 @@ Provide *editing-settings.el*
     :commands lsp
     :init
     (setq lsp-enable-file-watchers nil)
+    '(lsp-mode)
     :config
     (setq lsp-lens-enable nil)
     (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
-    (setq lsp-modeline-code-actions-segments '(count icon name)))
+    (setq lsp-modeline-code-actions-segments '(count icon name))
+    (setq lsp-elixir-ls-version "v0.23.0"))
 
   (use-package flycheck
     :ensure t
@@ -527,6 +582,36 @@ Provide *editing-settings.el*
           lsp-prefer-flymake nil
           lsp-log-io nil))
 
+  ;; LSP BOOSTER :rocket:
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 
   (use-package elixir-yasnippets
     :ensure t)
@@ -545,6 +630,15 @@ Provide *editing-settings.el*
     :config
     (projectile-mode +1)
     (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+
+  (use-package exunit
+    :ensure t
+    :config
+    (add-hook 'elixir-mode-hook 'exunit-mode))
+
+  (use-package exec-path-from-shell
+    :ensure t
+    :init (exec-path-from-shell-initialize))
 #+END_SRC
 
 ** Provide
