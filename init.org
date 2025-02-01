@@ -494,6 +494,38 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
   (setq openai-key "key")
 #+END_SRC
 
+** Consult
+#+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
+  (use-package consult
+    :ensure t
+    :bind (;; A recursive grep
+           ;; ("M-s M-g" . consult-ripgrep)
+           ;; Search for files names recursively
+           ;; ("M-s M-f" . consult-find)
+           ;; Search through the outline (headings) of the file
+           ("C-c o" . consult-outline)
+           ("C-c i" . consult-imenu)
+           ;; Switch to another buffer, or bookmarked file, or recently
+           ;; opened file.
+           ;; ("M-s M-b" . consult-buffer)
+           ("C-x b" . consult-buffer)
+           ("M-y" . consult-yank-pop)
+           :map isearch-mode-map
+           )
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+    :init
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-function (lambda (_) (projectile-project-root)))
+    (recentf-mode 1))
+
+  (use-package consult-lsp
+    :ensure t
+    :after lsp-mode
+    :bind (:map lsp-mode-map ("M-s i" . consult-lsp-file-symbols))
+    :init
+    (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols))
+#+END_SRC
+
 
 ** Provide
 Provide *editing-settings.el*
@@ -557,13 +589,20 @@ Provide *editing-settings.el*
 
   (use-package lsp-mode
     :ensure t
-    :hook ((elixir-mode . lsp)
+    :hook ((elixir-ts-mode . lsp)
+           (heex-ts-mode . lsp)
            (before-save . lsp-format-buffer)
            (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp
     :init
     (setq lsp-enable-file-watchers nil)
     '(lsp-mode)
+    (add-hook 'elixir-ts-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook #'lsp-format-buffer t t)))
+    (add-hook 'heex-ts-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook #'lsp-format-buffer t t)))
     :config
     (setq lsp-lens-enable nil)
     (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
@@ -633,13 +672,28 @@ Provide *editing-settings.el*
 
   (use-package exunit
     :ensure t
-    :config
-    (add-hook 'elixir-mode-hook 'exunit-mode))
+    :hook ((elixir-ts-mode . exunit-mode)))
 
   (use-package exec-path-from-shell
     :ensure t
     :init (exec-path-from-shell-initialize))
 #+END_SRC
+
+** Golang
+#+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
+  (use-package go-mode
+    :ensure t
+    :config
+    (add-hook 'go-mode-hook 'lsp-deferred)
+    (add-hook 'go-mode-hook 'subword-mode)
+    (add-hook 'before-save-hook 'gofmt-before-save)
+
+    (add-hook 'go-mode-hook (lambda ()
+                              (setq tab-width 4)
+                              (flycheck-add-next-checker 'lsp 'go-vet)
+                              (flycheck-add-next-checker 'lsp 'go-staticcheck))))
+#+END_SRC
+
 
 ** Provide
 Provide **programmin-languages.el**
