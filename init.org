@@ -792,6 +792,8 @@ Providing *magit-settings.el*
   (use-package org-roam-ui
     :after org-roam
     :ensure t)
+
+  (require 'org-tempo)
 #+END_SRC
 
 
