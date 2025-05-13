@@ -320,24 +320,28 @@ Provide *interface-settings.el*
 Kill all buffers
 
 #+BEGIN_SRC elisp :tangle ./plugins/clean-buffers.el :mkdirp yesn
-(defun kill-buffers()
-  (let (buffer buffers)
-    (setq buffers (buffer-list))
-    (dotimes (i (length buffers))
-      (setq buffer (pop buffers))
-      (if (not (string-equal (buffer-name buffer) "*scratch*")) (kill-buffer buffer) nil))))
+  (defun kill-buffers()
+    (let (buffer buffers)
+      (setq buffers (buffer-list))
+      (dotimes (i (length buffers))
+        (setq buffer (pop buffers))
+        (if (not (string-equal (buffer-name buffer) "*scratch*")) (kill-buffer buffer) nil))))
 
-(defun clean-buffers()
-       (interactive)
-       (if (yes-or-no-p "Do you really want to clean all buffers? ")
-           (kill-buffers) nil))
+  (defun clean-buffers()
+    (interactive)
+    (if (yes-or-no-p "Do you really want to clean all buffers? ")
+        (kill-buffers) nil))
 
-(global-set-key (kbd "C-x C-k") 'clean-buffers)
+  (global-set-key (kbd "C-x C-k") 'clean-buffers)
 
-(provide 'clean-buffers)
+  (defun date-now ()
+    (interactive)
+    (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
+
+  (global-set-key (kbd "C-c d") 'date-now)
+
+  (provide 'clean-buffers)
 #+END_SRC
-
-
 
 * Editing
 :PROPERTIES:
@@ -580,7 +584,7 @@ Provide *editing-settings.el*
 
 ** Elixir
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package elixir-mode
+  (use-package elixir-ts-mode
     :ensure t)
 
   (setq lsp-keymap-prefix "M-s")

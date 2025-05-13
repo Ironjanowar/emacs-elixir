@@ -6,10 +6,16 @@
       (if (not (string-equal (buffer-name buffer) "*scratch*")) (kill-buffer buffer) nil))))
 
 (defun clean-buffers()
-       (interactive)
-       (if (yes-or-no-p "Do you really want to clean all buffers? ")
-           (kill-buffers) nil))
+  (interactive)
+  (if (yes-or-no-p "Do you really want to clean all buffers? ")
+      (kill-buffers) nil))
 
 (global-set-key (kbd "C-x C-k") 'clean-buffers)
+
+(defun date-now ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
+
+(global-set-key (kbd "C-c d") 'date-now)
 
 (provide 'clean-buffers)
