@@ -505,6 +505,17 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
     (setq chatgpt-model "gpt-4o"))
 
   (setq openai-key "key")
+
+
+  (use-package claude-code
+    :straight (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main"
+                     :files ("*.el" (:exclude "demo.gif")))
+    :bind-keymap
+    ("C-c a" . claude-code-command-map)
+    :config
+    (setenv "ANTHROPIC_API_KEY" "key)
+    (setenv "ANTHROPIC_AUTH_TOKEN" "key)
+    (claude-code-mode))
 #+END_SRC
 
 ** Consult
