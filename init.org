@@ -846,23 +846,14 @@ Providing *magit-settings.el*
 
   ;; Copy-pasted from a guy from Reddit https://www.reddit.com/r/emacs/comments/1gogzcy/is_there_an_emacs_mode_to_execute_graphql_against/
   (defun shopify-query (rs)
-    "Convert RS to a GraphQL query."
-    (shopify--convert-to-graphql rs "query"))
-
-  (defun shopify-mutation (rs)
-    "Convert RS to a GraphQL mutation."
-    (shopify--convert-to-graphql rs "mutation"))
-
-  (defun shopify--convert-to-graphql (rs type)
     "Converts RS to a regular json request.
 
   TYPE is used to set the type of the query, i.e.
   { \"query\": \"TYPE ... \"}"
     (let ((graphql (shopify--graphqlify (oref rs body))))
       (oset rs body (shopify--pretty-print-graphql
-                     (format "{\"query\": \"%s %s\"%s}"
-                             type
-                             (car graphql)
+                     (format "{\"query\": %s%s}"
+                             (format "%S" (car graphql))
                              (shopify--graphql-variables (cdr graphql))))))
     rs)
 
