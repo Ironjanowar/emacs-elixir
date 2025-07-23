@@ -19,6 +19,8 @@
   (require 'clean-buffers)
 
   (require 'roam)
+
+  (require 'verb-config)
 #+END_SRC
 
 * Package Management
@@ -32,19 +34,19 @@ Milkypostman’s Emacs Lisp Package Archive - https://melpa.org/#/
 Adding ~melpa stable~ to avoid conflicts.
 
 #+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
-
   (when (>= emacs-major-version 24)
-    (setq package-archives '(("melpa" . "http://melpa.org/packages/")
-                             ("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
-                             ("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/")
-                             ("gnu" . "http://elpa.gnu.org/packages/")))
-    (setq package-archive-priorities '(("melpa" . 5)
-                                       ("melpa-stable" . 4)
-                                       ("jcs-elpa" . 0)
-                                       ("gnu" . 1)))
-    (setq url-queue-timeout 30)
-    (require 'package)
-    (package-initialize))
+     (setq package-archives '(
+           		    ("melpa" . "http://melpa.org/packages/")
+                              ("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
+                              ("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/")
+                              ("gnu" . "http://elpa.gnu.org/packages/")))
+     (setq package-archive-priorities '(("melpa" . 5)
+                                        ("melpa-stable" . 4)
+                                        ("jcs-elpa" . 0)
+                                        ("gnu" . 1)))
+     (setq url-queue-timeout 30)
+     (require 'package)
+     (package-initialize))
 #+END_SRC
 
 ** Use-package
@@ -170,7 +172,7 @@ Cleaner interface, cleaner life.
 
 ** Font
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
-  (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono 11" ))
+  (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono Nerd Font Complete Mono 11" ))
 #+END_SRC
 
 ** Doom modeline
@@ -202,51 +204,52 @@ I wanted a symbol in the left hand so I con move with *<symbol> +
 ** Vertico
 
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
-  ;; Thanks to @devcexx <3
-  ;; https://github.com/devcexx/emacs-config/blob/master/config/avoc-text-utils.el#L22
-  (defun avoc-text-utils-delete-word (arg)
-    "Delete characters forward until encountering the end of a word.
-  With argument ARG, do this that many times."
-    (interactive "p")
-    (delete-region (point) (progn (forward-word arg) (point))))
+    ;; Thanks to @devcexx <3
+    ;; https://github.com/devcexx/emacs-config/blob/master/config/avoc-text-utils.el#L22
+    (defun avoc-text-utils-delete-word (arg)
+      "Delete characters forward until encountering the end of a word.
+    With argument ARG, do this that many times."
+      (interactive "p")
+      (delete-region (point) (progn (forward-word arg) (point))))
 
-  (defun avoc-text-utils-backward-delete-word (arg)
-    "Delete characters backward until encountering the beginning of a word.
-  With argument ARG, do this that many times."
-    (interactive "p")
-    (avoc-text-utils-delete-word (- arg)))
+    (defun avoc-text-utils-backward-delete-word (arg)
+      "Delete characters backward until encountering the beginning of a word.
+    With argument ARG, do this that many times."
+      (interactive "p")
+      (avoc-text-utils-delete-word (- arg)))
 
-  ;; Enable vertico
-  (use-package vertico
-    :ensure t
-    :bind (:map minibuffer-local-map ("C-l" . avoc-text-utils-backward-delete-word))
-    :init
-    (vertico-mode)
-    (setq vertico-cycle t))
+    ;; Enable vertico
+    (use-package vertico
+      :ensure t
+      :bind (:map minibuffer-local-map ("C-l" . avoc-text-utils-backward-delete-word))
+      :init
+      (vertico-mode)
+      (setq vertico-cycle t)
+      (setq enable-recursive-minibuffers t))
 
-  (use-package orderless
-    :ensure t
-    :init
-    (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
+    (use-package orderless
+      :ensure t
+      :init
+      (setq completion-styles '(orderless)
+            completion-category-defaults nil
+            completion-category-overrides '((file (styles . (partial-completion))))))
 
-  ;; Persist history over Emacs restarts. Vertico sorts by history position.
-  (use-package savehist
-    :ensure t
-    :init
-    (savehist-mode))
+    ;; Persist history over Emacs restarts. Vertico sorts by history position.
+    (use-package savehist
+      :ensure t
+      :init
+      (savehist-mode))
 
-  (use-package marginalia
-    :after vertico
-    :ensure t
-    :custom
-    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-    :init
-    (marginalia-mode))
+    (use-package marginalia
+      :after vertico
+      :ensure t
+      :custom
+      (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+      :init
+      (marginalia-mode))
 
-  (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 #+END_SRC
 
 
@@ -300,12 +303,17 @@ Start Emacs maximized
                             (agenda . 5))))
 #+END_SRC
 
-** All the icons!
+** Nerd icons!
 Lets have all the icons
 
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
-  (use-package all-the-icons
+  (use-package nerd-icons
     :ensure t)
+
+  (use-package nerd-icons-completion
+    :ensure t
+    :config
+    (nerd-icons-completion-mode))
 #+END_SRC
 
 ** Provide
@@ -470,13 +478,9 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
 ** Ripgrep
 
 #+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
-  (use-package helm-rg
-    :ensure t
-    :config (global-set-key (kbd "C-c C-s") 'helm-rg))
-
-  ;; (use-package rg
+  ;; (use-package helm-rg
   ;;   :ensure t
-  ;;   :config (global-set-key (kbd "C-c s") 'rg))
+  ;;   :config (global-set-key (kbd "C-c C-s") 'helm-rg))
 
   (use-package deadgrep
     :ensure t
@@ -513,9 +517,12 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
     :bind-keymap
     ("C-c a" . claude-code-command-map)
     :config
-    (setenv "ANTHROPIC_API_KEY" "key)
-    (setenv "ANTHROPIC_AUTH_TOKEN" "key)
+    (setenv "ANTHROPIC_API_KEY" "")
+    (setenv "ANTHROPIC_AUTH_TOKEN" "")
     (claude-code-mode))
+
+  (use-package claude-code-ide
+    :straight (:type git :host github :repo "manzaltu/claude-code-ide.el"))
 #+END_SRC
 
 ** Consult
@@ -533,6 +540,9 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
            ;; opened file.
            ;; ("M-s M-b" . consult-buffer)
            ("C-x b" . consult-buffer)
+           ("C-x C-b" . consult-buffer)
+           ("M-y" . consult-yank-from-kill-ring)
+           ("C-c C-s" . consult-ripgrep)
            :map isearch-mode-map
            )
     :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -630,7 +640,7 @@ Provide *editing-settings.el*
     (setq lsp-lens-enable nil)
     (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
     (setq lsp-modeline-code-actions-segments '(count icon name))
-    (setq lsp-elixir-ls-version "v0.23.0"))
+    (setq lsp-elixir-ls-version "v0.28.0"))
 
   (use-package flycheck
     :ensure t
@@ -817,4 +827,69 @@ Providing *magit-settings.el*
 
 #+BEGIN_SRC elisp :tangle ./settings/roam.el :mkdirp yes
 (provide 'roam)
+#+END_SRC
+
+* Verb
+:PROPERTIES:
+:tangle: ~/.emacs.d/settings/verb-config.el
+:END:
+
+** Verb
+
+#+BEGIN_SRC elisp :tangle ./settings/verb-config.el :mkdirp yes
+  (use-package verb
+    :ensure t)
+
+  (use-package org
+    :mode ("\\.org\\'" . org-mode)
+    :config (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
+
+  ;; Copy-pasted from a guy from Reddit https://www.reddit.com/r/emacs/comments/1gogzcy/is_there_an_emacs_mode_to_execute_graphql_against/
+  (defun shopify-query (rs)
+    "Convert RS to a GraphQL query."
+    (shopify--convert-to-graphql rs "query"))
+
+  (defun shopify-mutation (rs)
+    "Convert RS to a GraphQL mutation."
+    (shopify--convert-to-graphql rs "mutation"))
+
+  (defun shopify--convert-to-graphql (rs type)
+    "Converts RS to a regular json request.
+
+  TYPE is used to set the type of the query, i.e.
+  { \"query\": \"TYPE ... \"}"
+    (let ((graphql (shopify--graphqlify (oref rs body))))
+      (oset rs body (shopify--pretty-print-graphql
+                     (format "{\"query\": \"%s %s\"%s}"
+                             type
+                             (car graphql)
+                             (shopify--graphql-variables (cdr graphql))))))
+    rs)
+
+  (defun shopify--graphqlify (body)
+    "Converts BODY to a cons cell with query in car and variables in cdr."
+    (let ((query (split-string (replace-regexp-in-string "[\n[:blank:]]+" " " body) " variables ")))
+      (cons (car query) (cadr query))))
+
+  (defun shopify--graphql-variables (variables)
+    "Returns variable part of query."
+    (if variables
+        (format ", \"variables\": %s" variables)
+      ""))
+
+  (defun shopify--pretty-print-graphql (body)
+    "Pretty print the body to make it more readable.
+
+  Useful when exporting the request to easily see exactly what is sent."
+    (with-temp-buffer
+      (insert body)
+      (json-pretty-print-buffer)
+      (buffer-string)))
+#+END_SRC
+
+
+** Provide
+
+#+BEGIN_SRC elisp :tangle ./settings/verb-config.el :mkdirp yes
+(provide 'verb-config)
 #+END_SRC
