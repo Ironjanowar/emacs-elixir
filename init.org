@@ -560,6 +560,31 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
 #+END_SRC
 
 
+** Escape buffer
+
+#+begin_src elisp :tangle ./settings/editing-settings.el :mkdirp yes
+  (defun escape-buffer ()
+    "Escapa el contenido del buffer actual y lo muestra en un nuevo buffer."
+    (interactive)
+    (let* ((contenido (buffer-substring-no-properties (point-min) (point-max)))
+           (escapado (format "%S" contenido)))
+      (with-current-buffer (get-buffer-create "*Escaped buffer*")
+        (erase-buffer)
+        (insert escapado)
+        (goto-char (point-min))
+        (pop-to-buffer (current-buffer)))))
+
+  (defun escape-region (inicio fin)
+    (interactive "r")
+    (let* ((contenido (buffer-substring-no-properties inicio fin))
+           (escapado (format "%S" contenido)))
+      (with-current-buffer (get-buffer-create "*Escaped region*")
+        (erase-buffer)
+        (insert escapado)
+        (goto-char (point-min))
+        (pop-to-buffer (current-buffer)))))
+#+end_src
+
 ** Provide
 Provide *editing-settings.el*
 
@@ -773,6 +798,9 @@ Magit is a lovely mode for git.
           ("TODO cesar" . "#FF0000")))
     :config
     (add-hook 'magit-mode-hook 'magit-todos-mode))
+
+  (setcdr magit-status-sections-hook
+    (push 'magit-insert-worktrees (cdr magit-status-sections-hook)))
 #+END_SRC
 
 ** Provide
