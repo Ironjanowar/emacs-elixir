@@ -172,7 +172,7 @@ Cleaner interface, cleaner life.
 
 ** Font
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
-  (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono Nerd Font Complete Mono 11" ))
+  (add-to-list 'default-frame-alist '(font . "DejaVuSansMono Nerd Font Mono 11" ))
 #+END_SRC
 
 ** Doom modeline
@@ -522,7 +522,12 @@ Edit with root user, open a file and execute ~M-x sudo-edit~
     (claude-code-mode))
 
   (use-package claude-code-ide
-    :straight (:type git :host github :repo "manzaltu/claude-code-ide.el"))
+    :straight (:type git :host github :repo "manzaltu/claude-code-ide.el" :files ("*.el"))
+    :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+    :custom
+    (claude-code-ide-enable-mcp-server t)
+    :config
+    (claude-code-ide-emacs-tools-setup))
 #+END_SRC
 
 ** Consult
@@ -611,21 +616,21 @@ Provide *editing-settings.el*
 
 ** Copilot
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package copilot
-    :straight '(copilot
-                :type git
-                :host github
-                :repo "zerolfx/copilot.el"
-                :branch "main"
-                :files ("dist" "*.el"))
-    :hook (prog-mode . copilot-mode)
-    :bind (:map copilot-completion-map
-                ("<tab>" . 'copilot-accept-completion)
-                ("TAB" . 'copilot-accept-completion)
-                ("C-TAB" . 'copilot-accept-completion-by-word)
-                ("C-<tab>" . 'copilot-accept-completion-by-word))
-    :config
-    (setq copilot-indent-offset-warning-disable t))
+  ;; (use-package copilot
+  ;;   :straight '(copilot
+  ;;               :type git
+  ;;               :host github
+  ;;               :repo "zerolfx/copilot.el"
+  ;;               :branch "main"
+  ;;               :files ("dist" "*.el"))
+  ;;   :hook (prog-mode . copilot-mode)
+  ;;   :bind (:map copilot-completion-map
+  ;;               ("<tab>" . 'copilot-accept-completion)
+  ;;               ("TAB" . 'copilot-accept-completion)
+  ;;               ("C-TAB" . 'copilot-accept-completion-by-word)
+  ;;               ("C-<tab>" . 'copilot-accept-completion-by-word))
+  ;;   :config
+  ;;   (setq copilot-indent-offset-warning-disable t))
 #+END_SRC
 
 ** Elixir
@@ -639,11 +644,6 @@ Provide *editing-settings.el*
     :ensure t
     :init
     (which-key-mode))
-
-  (use-package helm-lsp
-    :ensure t
-    :diminish lsp-mode
-    :commands helm-lsp-workspace-symbol)
 
   (use-package lsp-mode
     :ensure t
@@ -665,7 +665,15 @@ Provide *editing-settings.el*
     (setq lsp-lens-enable nil)
     (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
     (setq lsp-modeline-code-actions-segments '(count icon name))
-    (setq lsp-elixir-ls-version "v0.28.0"))
+    (setq lsp-elixir-ls-version "v0.29.2")
+    ;; (setq lsp-elixir-server-command '("/usr/local/bin/expert"))
+    )
+
+  (use-package helm-lsp
+    :ensure t
+    :diminish lsp-mode
+    :after lsp-mode
+    :commands helm-lsp-workspace-symbol)
 
   (use-package flycheck
     :ensure t
