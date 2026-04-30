@@ -105,8 +105,15 @@ Backup `~` ended files in ~.emacs.d/backup/~.
 (use-package exec-path-from-shell
   :ensure t
   :config
-  (exec-path-from-shell-copy-env "SSH_AGENT_PID")
-  (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
+  ;; Source SSH agent env directly from fish_ssh_agent's bash-compatible output
+  ;; (exec-path-from-shell uses zsh which doesn't have these vars)
+  (let ((agent-env (expand-file-name "~/.ssh/agent.env")))
+    (when (file-exists-p agent-env)
+      (with-temp-buffer
+        (insert-file-contents agent-env)
+        (dolist (line (split-string (buffer-string) "\n" t))
+          (when (string-match "\\`\\(SSH_[A-Z_]+\\)=\\([^;]+\\)" line)
+            (setenv (match-string 1 line) (match-string 2 line))))))))
 #+END_SRC
 
 
