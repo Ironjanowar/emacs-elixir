@@ -3,6 +3,8 @@
 :tangle: ~/.emacs.d/init.el
 :END:
 #+BEGIN_SRC elisp :tangle "~/.emacs.d/init.el"
+  ;;; -*- lexical-binding: t -*-
+
   (add-to-list 'load-path "~/.emacs.d/settings/")
   (add-to-list 'load-path "~/.emacs.d/plugins/")
 
@@ -34,12 +36,13 @@ Milkypostman’s Emacs Lisp Package Archive - https://melpa.org/#/
 Adding ~melpa stable~ to avoid conflicts.
 
 #+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
+  ;;; -*- lexical-binding: t -*-
   (when (>= emacs-major-version 24)
      (setq package-archives '(
-           		    ("melpa" . "http://melpa.org/packages/")
-                              ("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
+           		    ("melpa" . "https://melpa.org/packages/")
+                              ("melpa-stable" . "https://stable.melpa.org/packages/")
                               ("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/")
-                              ("gnu" . "http://elpa.gnu.org/packages/")))
+                              ("gnu" . "https://elpa.gnu.org/packages/")))
      (setq package-archive-priorities '(("melpa" . 5)
                                         ("melpa-stable" . 4)
                                         ("jcs-elpa" . 0)
@@ -58,10 +61,9 @@ https://github.com/jwiegley/use-package
 
 #+BEGIN_SRC elisp :tangle ./settings/package-management-settings.el :mkdirp yes
 
-(unless (featurep 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package)
-  )
+;; use-package is installed via straight.el below, so no need to
+;; package-install it here (that would call package-refresh-contents
+;; on every startup and hang).
 
 #+END_SRC
 
@@ -134,6 +136,7 @@ This let us save buffers from one session to another, but I personally
 don't use it so we're gonna comment this by now.
 
 #+BEGIN_SRC elisp :tangle ./settings/interface-settings.el :mkdirp yes
+;;; -*- lexical-binding: t -*-
 ;; (desktop-save-mode 1)
 #+END_SRC
 
@@ -335,6 +338,7 @@ Provide *interface-settings.el*
 Kill all buffers
 
 #+BEGIN_SRC elisp :tangle ./plugins/clean-buffers.el :mkdirp yesn
+  ;;; -*- lexical-binding: t -*-
   (defun kill-buffers()
     (let (buffer buffers)
       (setq buffers (buffer-list))
@@ -365,6 +369,7 @@ Kill all buffers
 
 ** Mute bell
 #+BEGIN_SRC elisp :tangle ./settings/editing-settings.el :mkdirp yes
+;;; -*- lexical-binding: t -*-
 (setq ring-bell-function 'ignore)
 #+END_SRC
 ** Mutiple cursors
@@ -612,6 +617,7 @@ Provide *editing-settings.el*
 ** Web
 
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
+  ;;; -*- lexical-binding: t -*-
   (use-package web-mode
     :ensure t
     :mode "\\.html.leex\\'"
@@ -644,6 +650,19 @@ Provide *editing-settings.el*
 #+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
   (use-package elixir-ts-mode
     :ensure t)
+
+  ;; Make sure the elixir/heex tree-sitter grammars are installed and
+  ;; built against the current libtree-sitter. If the .so is missing or
+  ;; can't be loaded (e.g. after a system upgrade that bumped
+  ;; libtree-sitter's ABI), this will rebuild it on the next Emacs start.
+  ;; To force a rebuild: rm ~/.emacs.d/tree-sitter/libtree-sitter-*.so
+  (with-eval-after-load 'treesit
+    (dolist (src '((elixir "https://github.com/elixir-lang/tree-sitter-elixir")
+                   (heex   "https://github.com/phoenixframework/tree-sitter-heex")))
+      (add-to-list 'treesit-language-source-alist src))
+    (dolist (lang '(elixir heex))
+      (unless (treesit-language-available-p lang)
+        (treesit-install-language-grammar lang))))
 
   (setq lsp-keymap-prefix "M-s")
 
@@ -752,22 +771,6 @@ Provide *editing-settings.el*
     :init (exec-path-from-shell-initialize))
 #+END_SRC
 
-** Golang
-#+BEGIN_SRC elisp :tangle ./settings/programming-languages.el :mkdirp yes
-  (use-package go-mode
-    :ensure t
-    :config
-    (add-hook 'go-mode-hook 'lsp-deferred)
-    (add-hook 'go-mode-hook 'subword-mode)
-    (add-hook 'before-save-hook 'gofmt-before-save)
-
-    (add-hook 'go-mode-hook (lambda ()
-                              (setq tab-width 4)
-                              (flycheck-add-next-checker 'lsp 'go-vet)
-                              (flycheck-add-next-checker 'lsp 'go-staticcheck))))
-#+END_SRC
-
-
 ** Provide
 Provide **programmin-languages.el**
 
@@ -785,6 +788,7 @@ Magit is a lovely mode for git.
 ** Settings
 
 #+BEGIN_SRC elisp :tangle ./settings/magit-settings.el :mkdirp yes
+  ;;; -*- lexical-binding: t -*-
   ;; Magit
   (use-package magit
     :ensure t
@@ -834,6 +838,7 @@ Providing *magit-settings.el*
 ** Org Roam
 
 #+BEGIN_SRC elisp :tangle ./settings/roam.el :mkdirp yes
+    ;;; -*- lexical-binding: t -*-
     (use-package org-roam
       :ensure t
       :init
@@ -880,6 +885,7 @@ Providing *magit-settings.el*
 ** Verb
 
 #+BEGIN_SRC elisp :tangle ./settings/verb-config.el :mkdirp yes
+  ;;; -*- lexical-binding: t -*-
   (use-package verb
     :ensure t)
 

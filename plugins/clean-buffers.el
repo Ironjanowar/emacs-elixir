@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (defun kill-buffers()
   (let (buffer buffers)
     (setq buffers (buffer-list))
